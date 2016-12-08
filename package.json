@@ -1,0 +1,11 @@
+{
+  "name": "mukhin_chat",
+  "description": "example chat application with socket.io",
+  "version": "0.0.1",
+  "dependencies": {
+    "client-sessions": "^0.7.0",
+    "fs": "",
+    "restify": "",
+    "socket.io": ""
+  }
+}
