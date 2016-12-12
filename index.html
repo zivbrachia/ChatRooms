@@ -14,8 +14,10 @@
 	});
 
 	// listener, whenever the server emits 'updatechat', this updates the chat body
-	socket.on('updatechat', function (username, data) {
-		$('#conversation0').append('<b>'+username + ':</b> ' + data + '<br>');
+	socket.on('updatechat', function (username, data, index) {
+		console.log(index + " " + username + " " + data);
+		$('#conversation' + index).append('<b>'+username + ':</b> ' + data + '<br>');
+		//$('#conversation0').append('<b>'+username + ':</b> ' + data + '<br>');
 	});
 
 	//socket.on('updateroom', function (room) {
@@ -27,6 +29,9 @@
 	socket.on('updaterooms', function(rooms, current_room) {
 		$('#rooms').empty();
 		$.each(rooms, function(key, value) {
+			if (value==null) {
+				return;
+			}
 			if(value == current_room){
 				$('#rooms').append('<div id="'+value+'">' + value + '</div>');
 			}
@@ -42,9 +47,13 @@
 		$('#status').empty();
 		var text = "you ("+user.username+") are connected.";
 		var chats = "";
-		console.log(user);
+		//console.log(user);
 		$.each(user.chats, function(key, value) {
-			chats = chats + " you are on (" + value + ")";
+			if (value==null){
+
+			} else {
+				chats = chats + " you are on (" + value + ")";
+			}
 		});
 		$('#status').html(text + chats);
 	});
@@ -52,32 +61,64 @@
 	socket.on('updateusers', function(usernames, current_user) {
 		$('#users').empty();
 		$.each(usernames.users, function(index, userObj) {
-			console.log(userObj.username + " " + userObj.chats.length);
+			//console.log(userObj.username + " " + userObj.chats.length);
 			$('#users').append('<div>' + userObj.username + ' (' + userObj.chats.length + ')' +'</div>');
 		});
 		$('#userConnected').empty();
 		$('#userConnected').append('<H3><u>USERS (' + usernames.users.length + ')</u></H3>');
 	});
 
+	socket.on('updateRoomName', function(roomName, index) {
+		index = index - 1	// always index is 1 or 2
+		$('#conversationName' + index).empty();
+		$('#conversationName' + index).html('<H3><u>' + roomName + '</u></H3>');
+	});
+
 	function switchRoom(room){
 		socket.emit('switchRoom', room);
+		//socket.emit('subscript',room);
 	}
 	
 	// on load of page
 	$(function(){
 		// when the client clicks SEND
 		$('#datasend0').click( function() {
-			var message = $('#data').val();
-			$('#data').val('');
+			var message = $('#data0').val();
+			$('#data0').val('');
 			// tell server to execute 'sendchat' and send along one parameter
-			socket.emit('sendchat', message);
+			socket.emit('sendchat', message, 0);
+		});
+
+		// when the client clicks SEND
+		$('#datasend1').click( function() {
+			var message = $('#data1').val();
+			$('#data1').val('');
+			// tell server to execute 'sendchat' and send along one parameter
+			socket.emit('sendchat', message, 1);
+		});
+
+		// when the client clicks end
+		$('#dataend0').click( function() {
+			socket.emit('unsubscribe', 0);
+		});
+
+		$('#dataend1').click( function() {
+			socket.emit('unsubscribe', 1);
 		});
 
 		// when the client hits ENTER on their keyboard
-		$('#data').keypress(function(e) {
+		$('#data0').keypress(function(e) {
 			if(e.which == 13) {
 				$(this).blur();
 				$('#datasend0').focus().click();
+			}
+		});
+
+		// when the client hits ENTER on their keyboard
+		$('#data1').keypress(function(e) {
+			if(e.which == 13) {
+				$(this).blur();
+				$('#datasend1').focus().click();
 			}
 		});
 	});
@@ -96,7 +137,7 @@
 	<div style="float:left;width:550px;height:350px;padding:10px;overflow:auto;border-right:1px solid black">
 		<div id="conversationName0"><H3><u>CHAT 1</u></H3></div>
 		<div id="conversation0"></div>
-		<input id="data" style="width:200px;" />
+		<input id="data0" style="width:200px;" />
 		<input type="button" id="datasend0" value="send" />
 		<input type="button" id="dataend0" value="end" />
 	</div>
