@@ -7,9 +7,5 @@
     "fs": "",
     "restify": "",
     "socket.io": ""
-  },
-  "scripts": {
-    "start": "node app.js"
-  },
-  "main": "app.js"
+  }
 }
