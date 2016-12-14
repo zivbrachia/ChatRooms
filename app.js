@@ -5,7 +5,7 @@ var socket = require('socket.io');
 var session = require('client-sessions');
 //
 var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 1234, function () {
+server.listen(process.env.OPENSHIFT_NODEJS_PORT || 8080, process.env.OPENSHIFT_NODEJS_IP || 'localhost', function () {
    console.log('%s listening to %s', server.name, server.url); 
 });
 //
